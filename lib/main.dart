@@ -40,17 +40,15 @@ class WallpaperHomeScreenState extends State<WallpaperHomeScreen> {
   void initState() {
     super.initState();
 
-    // Listen to the accelerometer events using the updated stream method.
     _accelerometerSubscription = accelerometerEventStream().listen((
       AccelerometerEvent event,
     ) {
       setState(() {
-        // Use a larger multiplier for a more pronounced effect.
+        // Increase the multiplier to force a more visible effect.
         _x = event.x * 20;
         _y = event.y * 20;
       });
-      // Print sensor values to the console for debugging.
-      print('Accelerometer reading: x=${event.x}, y=${event.y}');
+      print("Accelerometer: x=${event.x}, y=${event.y}");
     });
   }
 
@@ -62,22 +60,30 @@ class WallpaperHomeScreenState extends State<WallpaperHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Retrieve device size for our container dimensions.
+    final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(title: const Text("Cinematic Wallpapers")),
+      // Allow the background to overflow if shifted.
       body: Stack(
+        clipBehavior: Clip.none,
         children: [
-          // Background moves according to sensor data.
-          Positioned.fill(
-            child: Transform.translate(
-              offset: Offset(_x, _y),
+          // Background image wrapped in a Transform.
+          Transform(
+            alignment: Alignment.center,
+            transform: Matrix4.translationValues(_x, _y, 0),
+            child: Container(
+              // Create a container larger than the screen.
+              width: size.width * 1.2,
+              height: size.height * 1.2,
               child: Image.asset('assets/background.jpg', fit: BoxFit.cover),
             ),
           ),
-          // Foreground remains static.
+          // The foreground remains static.
           Positioned.fill(
             child: Image.asset('assets/foreground.png', fit: BoxFit.cover),
           ),
-          // Overlay debug text to see the current sensor values
+          // Debug overlay to display accelerometer values.
           Positioned(
             bottom: 30,
             left: 20,
