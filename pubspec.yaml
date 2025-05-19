@@ -1,0 +1,33 @@
+name: cinematic_wallpapers
+description: "A Flutter app for cinematic wallpapers with motion-based effects."
+publish_to: 'none' # Keep this for private projects
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Machine Learning for depth estimation
+  tflite_flutter: ^0.11.0  
+
+  # Sensor-based motion effects (accelerometer/gyroscope)
+  sensors_plus: ^6.1.1    
+
+  # UI Enhancements
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/background.png   # Ensure correct filename
+    - assets/foreground.png
