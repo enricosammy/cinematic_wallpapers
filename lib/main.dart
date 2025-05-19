@@ -3,43 +3,54 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:async';
 
 void main() {
-  runApp(CinematicWallpapersApp());
+  runApp(
+    const Directionality(
+      textDirection: TextDirection.ltr,
+      child: CinematicWallpapersApp(),
+    ),
+  );
 }
 
 class CinematicWallpapersApp extends StatelessWidget {
+  const CinematicWallpapersApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Cinematic Wallpapers',
       theme: ThemeData.dark(),
-      home: CinematicHomeScreen(),
+      home: const WallpaperHomeScreen(),
     );
   }
 }
 
-class CinematicHomeScreen extends StatefulWidget {
+class WallpaperHomeScreen extends StatefulWidget {
+  const WallpaperHomeScreen({Key? key}) : super(key: key);
+
   @override
-  _CinematicHomeScreenState createState() => _CinematicHomeScreenState();
+  WallpaperHomeScreenState createState() => WallpaperHomeScreenState();
 }
 
-class _CinematicHomeScreenState extends State<CinematicHomeScreen> {
-  // Variables to hold sensor values (these will control the parallax offsets)
+class WallpaperHomeScreenState extends State<WallpaperHomeScreen> {
   double _x = 0.0;
   double _y = 0.0;
-  StreamSubscription? _accelerometerSubscription;
+  StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
 
   @override
   void initState() {
     super.initState();
-    // Listen to accelerometer events
-    _accelerometerSubscription = accelerometerEvents.listen((
+
+    // Listen to the accelerometer events using the updated stream method.
+    _accelerometerSubscription = accelerometerEventStream().listen((
       AccelerometerEvent event,
     ) {
       setState(() {
-        // We invert here to create a more natural effect (feel free to adjust these multipliers)
-        _x = event.x * 2;
-        _y = event.y * 2;
+        // Use a larger multiplier for a more pronounced effect.
+        _x = event.x * 20;
+        _y = event.y * 20;
       });
+      // Print sensor values to the console for debugging.
+      print('Accelerometer reading: x=${event.x}, y=${event.y}');
     });
   }
 
@@ -52,31 +63,30 @@ class _CinematicHomeScreenState extends State<CinematicHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Cinematic Wallpaper Demo")),
+      appBar: AppBar(title: const Text("Cinematic Wallpapers")),
       body: Stack(
         children: [
-          // Background image: moves more for a deeper parallax effect.
+          // Background moves according to sensor data.
           Positioned.fill(
             child: Transform.translate(
               offset: Offset(_x, _y),
               child: Image.asset('assets/background.jpg', fit: BoxFit.cover),
             ),
           ),
-          // Foreground image: moves less to simulate depth.
+          // Foreground remains static.
           Positioned.fill(
-            child: Transform.translate(
-              offset: Offset(_x / 2, _y / 2),
-              child: Image.asset('assets/foreground.png', fit: BoxFit.cover),
-            ),
+            child: Image.asset('assets/foreground.png', fit: BoxFit.cover),
           ),
-          // Centered message for demonstration purposes.
-          Center(
-            child: Text(
-              'Move Your Device',
-              style: TextStyle(
-                fontSize: 24,
-                color: Colors.white,
-                shadows: [Shadow(blurRadius: 5, color: Colors.black)],
+          // Overlay debug text to see the current sensor values
+          Positioned(
+            bottom: 30,
+            left: 20,
+            child: Container(
+              color: Colors.black38,
+              padding: const EdgeInsets.all(8),
+              child: Text(
+                'Accelerometer: x=${_x.toStringAsFixed(2)}, y=${_y.toStringAsFixed(2)}',
+                style: const TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
           ),
